@@ -37,3 +37,40 @@ func insertNode(node *TreeNode, val int) {
 		}
 	}
 }
+func (bst *Bst) InorderTreeWalk(node *TreeNode, resultList *[]int) {
+	if node == nil {
+		return
+	}
+	if node.Left != nil {
+		bst.InorderTreeWalk(node.Left, resultList)
+	}
+	*resultList = append(*resultList, node.Val)
+	if node.Right != nil {
+		bst.InorderTreeWalk(node.Right, resultList)
+	}
+}
+func (bst *Bst) PreorderTreeWalk(node *TreeNode, resultList *[]int) {
+	if node == nil {
+		return
+	}
+	*resultList = append(*resultList, node.Val)
+	if node.Left != nil {
+		bst.PreorderTreeWalk(node.Left, resultList)
+	}
+	if node.Right != nil {
+		bst.PreorderTreeWalk(node.Right, resultList)
+	}
+}
+
+func (bst *Bst) PostorderTreeWalk(node *TreeNode, resultList *[]int) {
+	if node == nil {
+		return
+	}
+	if node.Left != nil {
+		bst.PostorderTreeWalk(node.Left, resultList)
+	}
+	if node.Right != nil {
+		bst.PostorderTreeWalk(node.Right, resultList)
+	}
+	*resultList = append(*resultList, node.Val)
+}
