@@ -1,5 +1,7 @@
 package Binary_Search_Tree
 
+import "math"
+
 type TreeNode struct {
 	Val   int
 	Left  *TreeNode
@@ -73,4 +75,70 @@ func (bst *Bst) PostorderTreeWalk(node *TreeNode, resultList *[]int) {
 		bst.PostorderTreeWalk(node.Right, resultList)
 	}
 	*resultList = append(*resultList, node.Val)
+}
+func (bst *Bst) Search(node *TreeNode, val int) bool {
+	if node == nil {
+		return false
+	}
+	if node.Val == val {
+		return true
+	}
+	if val < node.Val {
+		return bst.Search(node.Left, val)
+	} else {
+		return bst.Search(node.Right, val)
+	}
+}
+func (bst *Bst) Minimum(node *TreeNode) int {
+	if node == nil {
+		return math.MinInt
+	}
+	if node.Left != nil {
+		return bst.Minimum(node.Left)
+	} else {
+		return node.Val
+	}
+}
+func (bst *Bst) Maximum(node *TreeNode) int {
+	if node == nil {
+		return math.MaxInt
+	}
+	if node.Right != nil {
+		return bst.Maximum(node.Right)
+	} else {
+		return node.Val
+	}
+}
+func (bst *Bst) TreeSuccessor(node *TreeNode) *TreeNode {
+	if node == nil {
+		return nil
+	}
+
+	if node.Right != nil {
+		return bst.TreeNodeMinimum(node.Right)
+	}
+
+	var successor *TreeNode
+	current := bst.Head
+	for current != nil {
+		if node.Val < current.Val {
+			successor = current
+			current = current.Left
+		} else if node.Val > current.Val {
+			current = current.Right
+		} else {
+			break
+		}
+	}
+	return successor
+}
+
+func (bst *Bst) TreeNodeMinimum(node *TreeNode) *TreeNode {
+	if node == nil {
+		return nil
+	}
+	for node.Left != nil {
+		node = node.Left
+	}
+	return node
 }
