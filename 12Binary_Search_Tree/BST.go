@@ -39,6 +39,7 @@ func insertNode(node *TreeNode, val int) {
 		}
 	}
 }
+
 func (bst *Bst) InorderTreeWalk(node *TreeNode, resultList *[]int) {
 	if node == nil {
 		return
@@ -51,6 +52,7 @@ func (bst *Bst) InorderTreeWalk(node *TreeNode, resultList *[]int) {
 		bst.InorderTreeWalk(node.Right, resultList)
 	}
 }
+
 func (bst *Bst) PreorderTreeWalk(node *TreeNode, resultList *[]int) {
 	if node == nil {
 		return
@@ -76,6 +78,7 @@ func (bst *Bst) PostorderTreeWalk(node *TreeNode, resultList *[]int) {
 	}
 	*resultList = append(*resultList, node.Val)
 }
+
 func (bst *Bst) Search(node *TreeNode, val int) bool {
 	if node == nil {
 		return false
@@ -89,6 +92,7 @@ func (bst *Bst) Search(node *TreeNode, val int) bool {
 		return bst.Search(node.Right, val)
 	}
 }
+
 func (bst *Bst) Minimum(node *TreeNode) int {
 	if node == nil {
 		return math.MinInt
@@ -99,6 +103,7 @@ func (bst *Bst) Minimum(node *TreeNode) int {
 		return node.Val
 	}
 }
+
 func (bst *Bst) Maximum(node *TreeNode) int {
 	if node == nil {
 		return math.MaxInt
@@ -109,6 +114,7 @@ func (bst *Bst) Maximum(node *TreeNode) int {
 		return node.Val
 	}
 }
+
 func (bst *Bst) TreeSuccessor(node *TreeNode) *TreeNode {
 	if node == nil {
 		return nil
@@ -139,6 +145,39 @@ func (bst *Bst) TreeNodeMinimum(node *TreeNode) *TreeNode {
 	}
 	for node.Left != nil {
 		node = node.Left
+	}
+	return node
+}
+
+func (bst *Bst) Delete(val int) {
+	bst.Head = bst.deleteNode(bst.Head, val)
+}
+
+func (bst *Bst) deleteNode(node *TreeNode, val int) *TreeNode {
+	if node == nil {
+		return nil
+	}
+	if val < node.Val {
+		node.Left = bst.deleteNode(node.Left, val)
+	} else if val > node.Val {
+		node.Right = bst.deleteNode(node.Right, val)
+	} else {
+		// 找到要删除的节点
+		if node.Left == nil && node.Right == nil {
+			// 节点是叶子节点
+			return nil
+		} else if node.Left == nil {
+			// 节点只有右子节点
+			return node.Right
+		} else if node.Right == nil {
+			// 节点只有左子节点
+			return node.Left
+		} else {
+			// 节点有两个子节点
+			minRight := bst.Minimum(node.Right)
+			node.Val = minRight
+			node.Right = bst.deleteNode(node.Right, minRight)
+		}
 	}
 	return node
 }
