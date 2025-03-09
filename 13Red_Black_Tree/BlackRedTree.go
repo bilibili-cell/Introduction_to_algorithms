@@ -129,3 +129,135 @@ func (tree *RedBlackTree) fixInsert(node *Node) {
 	}
 	tree.Head.Color = BLACK
 }
+
+func (tree *RedBlackTree) Delete(value int) {
+	node := searchNode(tree.Head, value)
+	if node == nil {
+		return
+	}
+	deleteColor := node.Color
+
+	var replaceNode *Node
+	if node.Left == nil {
+		replaceNode = node.Right
+		transplant(tree, node, node.Right)
+	} else if node.Right == nil {
+		replaceNode = node.Left
+		transplant(tree, node, node.Left)
+	} else {
+		successor := treeMinimum(node.Right)
+		deleteColor = successor.Color
+		replaceNode = successor.Right
+		if successor.Parent == node {
+			if replaceNode != nil {
+				replaceNode.Parent = successor
+			}
+		} else {
+			transplant(tree, successor, successor.Right)
+			successor.Right = node.Right
+			successor.Right.Parent = successor
+		}
+		transplant(tree, node, successor)
+		successor.Left = node.Left
+		successor.Left.Parent = successor
+		successor.Color = node.Color
+	}
+	if deleteColor == BLACK {
+		tree.fixDelete(replaceNode)
+	}
+}
+
+func searchNode(root *Node, value int) *Node {
+	if root == nil || root.Value == value {
+		return root
+	}
+	if value < root.Value {
+		return searchNode(root.Left, value)
+	}
+	return searchNode(root.Right, value)
+}
+
+func transplant(tree *RedBlackTree, u, v *Node) {
+	if u.Parent == nil {
+		tree.Head = v
+	} else if u == u.Parent.Left {
+		u.Parent.Left = v
+	} else {
+		u.Parent.Right = v
+	}
+	if v != nil {
+		v.Parent = u.Parent
+	}
+}
+
+func treeMinimum(node *Node) *Node {
+	for node.Left != nil {
+		node = node.Left
+	}
+	return node
+}
+
+func (tree *RedBlackTree) fixDelete(node *Node) {
+	for node != tree.Head && (node == nil || node.Color == BLACK) {
+		if node == node.Parent.Left {
+			sibling := node.Parent.Right
+			if sibling.Color == RED {
+				sibling.Color = BLACK
+				node.Parent.Color = RED
+				tree.LeftRotate(node.Parent)
+				sibling = node.Parent.Right
+			}
+			if (sibling.Left == nil || sibling.Left.Color == BLACK) && (sibling.Right == nil || sibling.Right.Color == BLACK) {
+				sibling.Color = RED
+				node = node.Parent
+			} else {
+				if sibling.Right == nil || sibling.Right.Color == BLACK {
+					if sibling.Left != nil {
+						sibling.Left.Color = BLACK
+					}
+					sibling.Color = RED
+					tree.RightRotate(sibling)
+					sibling = node.Parent.Right
+				}
+				sibling.Color = node.Parent.Color
+				node.Parent.Color = BLACK
+				if sibling.Right != nil {
+					sibling.Right.Color = BLACK
+				}
+				tree.LeftRotate(node.Parent)
+				node = tree.Head
+			}
+		} else {
+			sibling := node.Parent.Left
+			if sibling.Color == RED {
+				sibling.Color = BLACK
+				node.Parent.Color = RED
+				tree.RightRotate(node.Parent)
+				sibling = node.Parent.Left
+			}
+			if (sibling.Left == nil || sibling.Left.Color == BLACK) && (sibling.Right == nil || sibling.Right.Color == BLACK) {
+				sibling.Color = RED
+				node = node.Parent
+			} else {
+				if sibling.Left == nil || sibling.Left.Color == BLACK {
+					if sibling.Right != nil {
+						sibling.Right.Color = BLACK
+					}
+					sibling.Color = RED
+					tree.LeftRotate(sibling)
+					sibling = node.Parent.Left
+				}
+				sibling.Color = node.Parent.Color
+				node.Parent.Color = BLACK
+				if sibling.Left != nil {
+					sibling.Left.Color = BLACK
+				}
+				tree.RightRotate(node.Parent)
+				node = tree.Head
+			}
+		}
+	}
+	if node != nil {
+		node.Color = BLACK
+	}
+}
